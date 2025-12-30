@@ -1,193 +1,86 @@
-// ====== CONFIG YOU EDIT ONCE ======
-const BUSINESS_NAME = "TurnHerOver";
-const SMS_NUMBER = "18000000000"; // <-- put your real number like 17025551234 (no dashes)
+/* =========================
+   TurnHerOver - app.js
+   State -> City -> Pricing -> SMS
+   ========================= */
 
-const ICON_HEART = "assets/heart.png";
+/** IMPORTANT:
+ * Put your real text number here (E.164 format).
+ * Example: +17025550123
+ */
+const BOOKING_NUMBER = "+17025550123";
 
-// Pricing model: base by city, with simple add-ons.
-// You can adjust these numbers anytime.
+/** Data from your Instawork screenshots (+ Canada),
+ * plus a couple “close distance” add-ons like Henderson/North Las Vegas.
+ */
 const DATA = {
-  "Arizona": {
-    "Phoenix":       { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Scottsdale":    { standard: 179, laundry: 39, resupply: 29, note: "Higher-demand area" },
-    "Mesa":          { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Tempe":         { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Glendale":      { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "California": {
-    "Los Angeles":   { standard: 219, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Long Beach":    { standard: 209, laundry: 45, resupply: 35, note: "Near LA" },
-    "Santa Monica":  { standard: 239, laundry: 49, resupply: 39, note: "Premium area" },
-    "Pasadena":      { standard: 219, laundry: 45, resupply: 35, note: "Near LA" },
-
-    "San Diego":     { standard: 209, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Chula Vista":   { standard: 199, laundry: 45, resupply: 35, note: "Near San Diego" },
-
-    "San Francisco Bay Area": { standard: 249, laundry: 55, resupply: 45, note: "Very high labor market" },
-    "Oakland":       { standard: 239, laundry: 55, resupply: 45, note: "Bay Area" },
-    "San Jose":      { standard: 239, laundry: 55, resupply: 45, note: "Bay Area" },
-  },
-
-  "Colorado": {
-    "Denver":        { standard: 189, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Aurora":        { standard: 179, laundry: 39, resupply: 29, note: "Near Denver" },
-  },
-
-  "District of Columbia": {
-    "Washington":    { standard: 199, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Arlington":     { standard: 199, laundry: 45, resupply: 35, note: "Near DC" },
-  },
-
-  "Florida": {
-    "Jacksonville":  { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Miami":         { standard: 189, laundry: 39, resupply: 29, note: "Higher demand" },
-    "Fort Lauderdale":{standard: 189, laundry: 39, resupply: 29, note: "Near Miami" },
-    "Orlando":       { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Kissimmee":     { standard: 159, laundry: 35, resupply: 25, note: "Near Orlando" },
-    "Tampa":         { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "St. Petersburg":{ standard: 169, laundry: 35, resupply: 25, note: "Near Tampa" },
-  },
-
-  "Georgia": {
-    "Atlanta":       { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Marietta":      { standard: 169, laundry: 39, resupply: 29, note: "Near Atlanta" },
-  },
-
-  "Illinois": {
-    "Chicago":       { standard: 189, laundry: 39, resupply: 29, note: "Higher labor market" },
-  },
-
-  "Indiana": {
-    "Indianapolis":  { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Kansas / Missouri": {
-    "Kansas City":   { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Kentucky": {
-    "Louisville":    { standard: 149, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Louisiana": {
-    "New Orleans":   { standard: 169, laundry: 35, resupply: 25, note: "Tourism market" },
-    "Metairie":      { standard: 159, laundry: 35, resupply: 25, note: "Near New Orleans" },
-  },
-
-  "Maryland": {
-    "Baltimore":     { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Massachusetts": {
-    "Boston":        { standard: 199, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Cambridge":     { standard: 209, laundry: 45, resupply: 35, note: "Near Boston" },
-  },
-
-  "Michigan": {
-    "Detroit":       { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Minnesota": {
-    "Minneapolis":   { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "St. Paul":      { standard: 179, laundry: 39, resupply: 29, note: "Near Minneapolis" },
-  },
-
-  "Missouri": {
-    "St. Louis":     { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Nevada": {
-    "Las Vegas":     { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Henderson":     { standard: 159, laundry: 35, resupply: 25, note: "Near Las Vegas" },
-    "North Las Vegas":{standard: 149, laundry: 35, resupply: 25, note: "Near Las Vegas" },
-    "Summerlin":     { standard: 169, laundry: 39, resupply: 29, note: "Premium area" },
-  },
-
-  "New Mexico": {
-    "Albuquerque":   { standard: 149, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "New York": {
-    "Buffalo":       { standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "New York City": { standard: 249, laundry: 59, resupply: 49, note: "Very high labor market" },
-    "Brooklyn":      { standard: 249, laundry: 59, resupply: 49, note: "NYC" },
-    "Queens":        { standard: 239, laundry: 59, resupply: 49, note: "NYC" },
-    "Rochester":     { standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-  },
-
-  "North Carolina": {
-    "Charlotte":     { standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Raleigh-Durham":{ standard: 169, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Ohio": {
-    "Cincinnati":    { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Cleveland":     { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Columbus":      { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Oregon": {
-    "Portland":      { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Beaverton":     { standard: 169, laundry: 39, resupply: 29, note: "Near Portland" },
-  },
-
-  "Pennsylvania": {
-    "Philadelphia":  { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Pittsburgh":    { standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-  },
-
-  "Rhode Island": {
-    "Providence":    { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-  },
-
-  "Tennessee": {
-    "Memphis":       { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Nashville":     { standard: 179, laundry: 39, resupply: 29, note: "Higher demand" },
-  },
-
-  "Texas": {
-    "Austin":        { standard: 179, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Dallas":        { standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "Houston":       { standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-    "San Antonio":   { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Utah": {
-    "Salt Lake City":{ standard: 169, laundry: 39, resupply: 29, note: "Typical 1–3 bed" },
-  },
-
-  "Virginia": {
-    "Richmond":      { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-    "Virginia Beach":{ standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  "Washington": {
-    "Seattle":       { standard: 209, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Bellevue":      { standard: 219, laundry: 45, resupply: 35, note: "Near Seattle" },
-  },
-
-  "Wisconsin": {
-    "Milwaukee":     { standard: 159, laundry: 35, resupply: 25, note: "Typical 1–3 bed" },
-  },
-
-  // Canada (optional)
-  "Canada": {
-    "Vancouver":     { standard: 209, laundry: 45, resupply: 35, note: "Higher labor market" },
-    "Toronto":       { standard: 209, laundry: 45, resupply: 35, note: "Higher labor market" },
-  }
+  "Arizona": ["Phoenix", "Scottsdale", "Tempe", "Mesa"],
+  "California": ["Los Angeles", "San Diego", "San Francisco Bay Area"],
+  "Colorado": ["Denver", "Aurora", "Lakewood"],
+  "District of Columbia": ["Washington"],
+  "Florida": ["Jacksonville", "Miami", "Orlando", "Tampa"],
+  "Georgia": ["Atlanta"],
+  "Illinois": ["Chicago"],
+  "Indiana": ["Indianapolis"],
+  "Kansas / Missouri": ["Kansas City"],
+  "Kentucky": ["Louisville"],
+  "Louisiana": ["New Orleans", "Metairie"],
+  "Maryland": ["Baltimore"],
+  "Massachusetts": ["Boston"],
+  "Michigan": ["Detroit"],
+  "Minnesota": ["Minneapolis", "St. Paul"],
+  "Missouri": ["St. Louis"],
+  "Nevada": ["Las Vegas", "North Las Vegas", "Henderson", "Paradise"],
+  "New Mexico": ["Albuquerque"],
+  "New York": ["Buffalo", "New York City", "Rochester"],
+  "North Carolina": ["Charlotte", "Raleigh–Durham"],
+  "Ohio": ["Cincinnati", "Cleveland", "Columbus"],
+  "Oregon": ["Portland"],
+  "Pennsylvania": ["Philadelphia", "Pittsburgh"],
+  "Rhode Island": ["Providence"],
+  "Tennessee": ["Memphis", "Nashville"],
+  "Texas": ["Austin", "Dallas", "Houston", "San Antonio"],
+  "Utah": ["Salt Lake City"],
+  "Virginia": ["Richmond", "Virginia Beach"],
+  "Washington": ["Seattle"],
+  "Wisconsin": ["Milwaukee"],
+  "Canada": ["Vancouver (BC)", "Toronto (ON)"]
 };
 
-// ====== APP STATE ======
-let currentScreen = "state"; // "state" | "city" | "pricing"
-let selectedState = null;
-let selectedCity = null;
+/** Cost-of-labor multipliers by market (rough tiers).
+ * If a city isn't listed here, it uses 1.0
+ */
+const CITY_MULTIPLIER = {
+  "San Francisco Bay Area": 1.35,
+  "New York City": 1.30,
+  "Boston": 1.20,
+  "Washington": 1.20,
+  "Seattle": 1.18,
+  "Los Angeles": 1.15,
+  "San Diego": 1.10,
+  "Miami": 1.08,
+  "Toronto (ON)": 1.12,
+  "Vancouver (BC)": 1.15,
+  "Austin": 1.05,
+  "Dallas": 1.03,
+  "Denver": 1.05,
+  "Chicago": 1.05,
+  "Las Vegas": 1.00,
+  "Phoenix": 0.98
+};
 
-// ====== ELEMENTS ======
+/** Base pricing (you can change these anytime) */
+const BASE = {
+  standard: 170,   // typical 1–3 bed turnover starting point
+  laundry: 25,     // per load/bundle
+  resupply: 35     // essentials restock
+};
+
+/* ===== DOM ===== */
 const screenTitle = document.getElementById("screenTitle");
 const screenSub = document.getElementById("screenSub");
-const list = document.getElementById("list");
 const backBtn = document.getElementById("backBtn");
+const list = document.getElementById("list");
+const comingSoonBtn = document.getElementById("comingSoonBtn");
 
 const pricingPanel = document.getElementById("pricingPanel");
 const pillLocation = document.getElementById("pillLocation");
@@ -202,127 +95,136 @@ const nResupply = document.getElementById("nResupply");
 
 const smsBtn = document.getElementById("smsBtn");
 
-// ====== HELPERS ======
-function money(n){
-  return `$${Number(n).toFixed(0)}`;
+/* ===== State ===== */
+let view = "state";   // "state" | "city" | "pricing"
+let selectedState = null;
+let selectedCity = null;
+
+/* ===== Helpers ===== */
+function money(n) {
+  return `$${Math.round(n)}`;
 }
 
-function isIOS(){
-  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+function getMultiplier(city) {
+  return CITY_MULTIPLIER[city] || 1.0;
 }
 
-// iOS likes: sms:1800...&body=
-// Android likes: sms:1800...?body=
-function smsLink(number, body){
-  const enc = encodeURIComponent(body);
-  if (isIOS()) return `sms:${number}&body=${enc}`;
-  return `sms:${number}?body=${enc}`;
+function clearList() {
+  list.innerHTML = "";
 }
 
-function makeBtn(label, onClick){
-  const a = document.createElement("a");
-  a.className = "btn";
-  a.href = "#";
-  a.innerHTML = `<img class="icon" src="${ICON_HEART}" alt="" /> ${label}`;
-  a.addEventListener("click", (e) => {
-    e.preventDefault();
-    onClick();
+function show(el) {
+  el.classList.remove("hidden");
+}
+
+function hide(el) {
+  el.classList.add("hidden");
+}
+
+function setBackVisible(visible) {
+  backBtn.style.display = visible ? "inline-flex" : "none";
+}
+
+function makeBtn(label, onClick) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn";
+  btn.textContent = `💖 ${label}`;
+  btn.addEventListener("click", onClick);
+  return btn;
+}
+
+/* ===== Renderers ===== */
+function renderStates() {
+  view = "state";
+  selectedState = null;
+  selectedCity = null;
+
+  screenTitle.textContent = "Select Your State 💖";
+  screenSub.textContent = "Check availability in your area";
+
+  setBackVisible(false);
+  hide(pricingPanel);
+
+  clearList();
+
+  // Sort states A-Z (Canada included)
+  const states = Object.keys(DATA).sort((a, b) => a.localeCompare(b));
+  states.forEach((state) => {
+    list.appendChild(makeBtn(state, () => renderCities(state)));
   });
-  return a;
+
+  // Keep “Coming Soon” always visible at bottom
+  comingSoonBtn.style.display = "inline-flex";
 }
 
-function clear(node){
-  while(node.firstChild) node.removeChild(node.firstChild);
+function renderCities(state) {
+  view = "city";
+  selectedState = state;
+  selectedCity = null;
+
+  screenTitle.textContent = `${state} — Select Your City 💖`;
+  screenSub.textContent = "Choose your nearest city";
+
+  setBackVisible(true);
+  hide(pricingPanel);
+
+  clearList();
+
+  const cities = (DATA[state] || []).slice();
+  cities.forEach((city) => {
+    list.appendChild(makeBtn(city, () => renderPricing(state, city)));
+  });
+
+  comingSoonBtn.style.display = "inline-flex";
 }
 
-// ====== RENDER ======
-function render(){
-  clear(list);
+function renderPricing(state, city) {
+  view = "pricing";
+  selectedState = state;
+  selectedCity = city;
 
-  // Back logic
-  backBtn.style.display = (currentScreen === "state") ? "none" : "block";
+  screenTitle.textContent = `${city} Pricing 💖`;
+  screenSub.textContent = "Tap below to text for booking";
 
-  // Hide pricing unless on pricing screen
-  pricingPanel.classList.toggle("hidden", currentScreen !== "pricing");
+  setBackVisible(true);
+  clearList();
+  comingSoonBtn.style.display = "none";
 
-  if (currentScreen === "state"){
-    screenTitle.textContent = "Select Your State 💖";
-    screenSub.textContent = "Check availability in your area";
+  const mult = getMultiplier(city);
 
-    Object.keys(DATA).sort().forEach(state => {
-      list.appendChild(makeBtn(state, () => {
-        selectedState = state;
-        selectedCity = null;
-        currentScreen = "city";
-        render();
-      }));
-    });
+  const standard = BASE.standard * mult;
+  const laundry = BASE.laundry * mult;
+  const resupply = BASE.resupply * mult;
 
-    return;
-  }
+  pillLocation.textContent = `${city}, ${state}`;
 
-  if (currentScreen === "city"){
-    screenTitle.textContent = `${selectedState} — Select Your City 💖`;
-    screenSub.textContent = "Tap your area to see pricing & text to book";
+  pStandard.textContent = money(standard);
+  pLaundry.textContent = money(laundry);
+  pResupply.textContent = money(resupply);
 
-    const cities = Object.keys(DATA[selectedState] || {}).sort();
-    cities.forEach(city => {
-      list.appendChild(makeBtn(city, () => {
-        selectedCity = city;
-        currentScreen = "pricing";
-        render();
-      }));
-    });
+  nStandard.textContent = "Typical 1–3 bed (starting)";
+  nLaundry.textContent = "Per load / bundle (starting)";
+  nResupply.textContent = "Essentials restock (starting)";
 
-    return;
-  }
+  // Prefilled SMS body
+  const body = encodeURIComponent(
+    `Hey! I'm a host in ${city}, ${state}. I need a turnover. ` +
+    `My listing is __ beds / __ baths. Check-out time is __ and next check-in is __. ` +
+    `Can you confirm availability + pricing?`
+  );
 
-  if (currentScreen === "pricing"){
-    screenTitle.textContent = "Pricing 💖";
-    screenSub.textContent = "Tap “Text to Book” and we’ll confirm availability";
+  // sms: works on phones; some Androids prefer ?body=, iPhone supports it
+  smsBtn.href = `sms:${BOOKING_NUMBER}?body=${body}`;
 
-    const pack = DATA[selectedState][selectedCity];
-    pillLocation.textContent = `${selectedCity}, ${selectedState}`;
-
-    pStandard.textContent = money(pack.standard);
-    pLaundry.textContent = `+ ${money(pack.laundry)}`;
-    pResupply.textContent = `+ ${money(pack.resupply)}`;
-
-    nStandard.textContent = pack.note || "Typical 1–3 bed";
-    nLaundry.textContent = "Laundry bundle / load (as needed)";
-    nResupply.textContent = "Restock essentials (host-approved list)";
-
-    const smsBody =
-`Hey ${BUSINESS_NAME} 💖
-I'm a host in ${selectedCity}, ${selectedState}.
-Property size (beds/baths): ___
-Next checkout date/time: ___
-Next check-in time: ___
-Any pets / heavy mess / same-day?: ___
-
-Can you confirm availability and the exact quote?`;
-
-    smsBtn.href = smsLink(SMS_NUMBER, smsBody);
-
-    return;
-  }
+  show(pricingPanel);
 }
 
-// ====== EVENTS ======
+/* ===== Events ===== */
 backBtn.addEventListener("click", () => {
-  if (currentScreen === "pricing"){
-    currentScreen = "city";
-    render();
-    return;
-  }
-  if (currentScreen === "city"){
-    currentScreen = "state";
-    selectedState = null;
-    selectedCity = null;
-    render();
-    return;
-  }
+  if (view === "pricing") return renderCities(selectedState);
+  if (view === "city") return renderStates();
 });
 
-// Boot
-render();
+/* ===== Boot ===== */
+renderStates();
