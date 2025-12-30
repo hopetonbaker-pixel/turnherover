@@ -19,7 +19,7 @@ body{
   color: var(--text);
   background:
     background:
-    linear-gradient(rgba(244,166,193,.78), rgba(244,166,193,.78)),
+    linear-gradient(rgba(244,166,193,.55), rgba(244,166,193,.55)),
     url("assets/bg.jpg") center/cover no-repeat fixed;
 }
 
