@@ -1,230 +1,217 @@
-/* =========================
-   TurnHerOver - app.js
-   State -> City -> Pricing -> SMS
-   ========================= */
+:root{
+  --pinkOverlay: rgba(244,166,193,.12);
+  --glass: rgba(255,255,255,.26);
+  --glass2: rgba(255,255,255,.18);
+  --btn: rgba(255,255,255,.22);
+  --btnHover: rgba(255,255,255,.30);
 
-/** IMPORTANT:
- * Put your real text number here (E.164 format).
- * Example: +17025550123
- */
-const BOOKING_NUMBER = "+17025550123";
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.72);
 
-/** Data from your Instawork screenshots (+ Canada),
- * plus a couple “close distance” add-ons like Henderson/North Las Vegas.
- */
-const DATA = {
-  "Arizona": ["Phoenix", "Scottsdale", "Tempe", "Mesa"],
-  "California": ["Los Angeles", "San Diego", "San Francisco Bay Area"],
-  "Colorado": ["Denver", "Aurora", "Lakewood"],
-  "District of Columbia": ["Washington"],
-  "Florida": ["Jacksonville", "Miami", "Orlando", "Tampa"],
-  "Georgia": ["Atlanta"],
-  "Illinois": ["Chicago"],
-  "Indiana": ["Indianapolis"],
-  "Kansas / Missouri": ["Kansas City"],
-  "Kentucky": ["Louisville"],
-  "Louisiana": ["New Orleans", "Metairie"],
-  "Maryland": ["Baltimore"],
-  "Massachusetts": ["Boston"],
-  "Michigan": ["Detroit"],
-  "Minnesota": ["Minneapolis", "St. Paul"],
-  "Missouri": ["St. Louis"],
-  "Nevada": ["Las Vegas", "North Las Vegas", "Henderson", "Paradise"],
-  "New Mexico": ["Albuquerque"],
-  "New York": ["Buffalo", "New York City", "Rochester"],
-  "North Carolina": ["Charlotte", "Raleigh–Durham"],
-  "Ohio": ["Cincinnati", "Cleveland", "Columbus"],
-  "Oregon": ["Portland"],
-  "Pennsylvania": ["Philadelphia", "Pittsburgh"],
-  "Rhode Island": ["Providence"],
-  "Tennessee": ["Memphis", "Nashville"],
-  "Texas": ["Austin", "Dallas", "Houston", "San Antonio"],
-  "Utah": ["Salt Lake City"],
-  "Virginia": ["Richmond", "Virginia Beach"],
-  "Washington": ["Seattle"],
-  "Wisconsin": ["Milwaukee"],
-  "Canada": ["Vancouver (BC)", "Toronto (ON)"]
-};
-
-/** Cost-of-labor multipliers by market (rough tiers).
- * If a city isn't listed here, it uses 1.0
- */
-const CITY_MULTIPLIER = {
-  "San Francisco Bay Area": 1.35,
-  "New York City": 1.30,
-  "Boston": 1.20,
-  "Washington": 1.20,
-  "Seattle": 1.18,
-  "Los Angeles": 1.15,
-  "San Diego": 1.10,
-  "Miami": 1.08,
-  "Toronto (ON)": 1.12,
-  "Vancouver (BC)": 1.15,
-  "Austin": 1.05,
-  "Dallas": 1.03,
-  "Denver": 1.05,
-  "Chicago": 1.05,
-  "Las Vegas": 1.00,
-  "Phoenix": 0.98
-};
-
-/** Base pricing (you can change these anytime) */
-const BASE = {
-  standard: 170,   // typical 1–3 bed turnover starting point
-  laundry: 25,     // per load/bundle
-  resupply: 35     // essentials restock
-};
-
-/* ===== DOM ===== */
-const screenTitle = document.getElementById("screenTitle");
-const screenSub = document.getElementById("screenSub");
-const backBtn = document.getElementById("backBtn");
-const list = document.getElementById("list");
-const comingSoonBtn = document.getElementById("comingSoonBtn");
-
-const pricingPanel = document.getElementById("pricingPanel");
-const pillLocation = document.getElementById("pillLocation");
-
-const pStandard = document.getElementById("pStandard");
-const pLaundry = document.getElementById("pLaundry");
-const pResupply = document.getElementById("pResupply");
-
-const nStandard = document.getElementById("nStandard");
-const nLaundry = document.getElementById("nLaundry");
-const nResupply = document.getElementById("nResupply");
-
-const smsBtn = document.getElementById("smsBtn");
-
-/* ===== State ===== */
-let view = "state";   // "state" | "city" | "pricing"
-let selectedState = null;
-let selectedCity = null;
-
-/* ===== Helpers ===== */
-function money(n) {
-  return `$${Math.round(n)}`;
+  --shadow: 0 14px 40px rgba(0,0,0,.12);
+  --radius: 18px;
 }
 
-function getMultiplier(city) {
-  return CITY_MULTIPLIER[city] || 1.0;
+*{ box-sizing:border-box; }
+
+html, body{
+  height:100%;
 }
 
-function clearList() {
-  list.innerHTML = "";
+body{
+  margin:0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  min-height:100vh;
+
+  color: var(--text);
+
+  /* IMPORTANT: keep the background image visible */
+  background:
+    linear-gradient(var(--pinkOverlay), var(--pinkOverlay)),
+    url("assets/bg.jpg") center/cover no-repeat fixed;
+
+  /* Helps iOS feel smoother */
+  -webkit-text-size-adjust: 100%;
 }
 
-function show(el) {
-  el.classList.remove("hidden");
+.wrap{
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 44px 18px 56px;
+  text-align:center;
 }
 
-function hide(el) {
-  el.classList.add("hidden");
+.logo{
+  width: min(360px, 90%);
+  height:auto;
+  margin: 6px auto 10px;
+  opacity:.60;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.10));
 }
 
-function setBackVisible(visible) {
-  backBtn.style.display = visible ? "inline-flex" : "none";
+.tagline{
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 6px 0 14px;
 }
 
-function makeBtn(label, onClick) {
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "btn";
-  btn.textContent = `💖 ${label}`;
-  btn.addEventListener("click", onClick);
-  return btn;
+.systemline{
+  font-size: 14px;
+  color: rgba(255,255,255,.78);
+  margin: 0 0 22px;
+  line-height:1.35;
 }
 
-/* ===== Renderers ===== */
-function renderStates() {
-  view = "state";
-  selectedState = null;
-  selectedCity = null;
-
-  screenTitle.textContent = "Select Your State 💖";
-  screenSub.textContent = "Check availability in your area";
-
-  setBackVisible(false);
-  hide(pricingPanel);
-
-  clearList();
-
-  // Sort states A-Z (Canada included)
-  const states = Object.keys(DATA).sort((a, b) => a.localeCompare(b));
-  states.forEach((state) => {
-    list.appendChild(makeBtn(state, () => renderCities(state)));
-  });
-
-  // Keep “Coming Soon” always visible at bottom
-  comingSoonBtn.style.display = "inline-flex";
+h1{
+  margin: 10px 0 6px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-shadow: 0 8px 24px rgba(0,0,0,.12);
 }
 
-function renderCities(state) {
-  view = "city";
-  selectedState = state;
-  selectedCity = null;
-
-  screenTitle.textContent = `${state} — Select Your City 💖`;
-  screenSub.textContent = "Choose your nearest city";
-
-  setBackVisible(true);
-  hide(pricingPanel);
-
-  clearList();
-
-  const cities = (DATA[state] || []).slice();
-  cities.forEach((city) => {
-    list.appendChild(makeBtn(city, () => renderPricing(state, city)));
-  });
-
-  comingSoonBtn.style.display = "inline-flex";
+.sub{
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 14px;
 }
 
-function renderPricing(state, city) {
-  view = "pricing";
-  selectedState = state;
-  selectedCity = city;
-
-  screenTitle.textContent = `${city} Pricing 💖`;
-  screenSub.textContent = "Tap below to text for booking";
-
-  setBackVisible(true);
-  clearList();
-  comingSoonBtn.style.display = "none";
-
-  const mult = getMultiplier(city);
-
-  const standard = BASE.standard * mult;
-  const laundry = BASE.laundry * mult;
-  const resupply = BASE.resupply * mult;
-
-  pillLocation.textContent = `${city}, ${state}`;
-
-  pStandard.textContent = money(standard);
-  pLaundry.textContent = money(laundry);
-  pResupply.textContent = money(resupply);
-
-  nStandard.textContent = "Typical 1–3 bed (starting)";
-  nLaundry.textContent = "Per load / bundle (starting)";
-  nResupply.textContent = "Essentials restock (starting)";
-
-  // Prefilled SMS body
-  const body = encodeURIComponent(
-    `Hey! I'm a host in ${city}, ${state}. I need a turnover. ` +
-    `My listing is __ beds / __ baths. Check-out time is __ and next check-in is __. ` +
-    `Can you confirm availability + pricing?`
-  );
-
-  // sms: works on phones; some Androids prefer ?body=, iPhone supports it
-  smsBtn.href = `sms:${BOOKING_NUMBER}?body=${body}`;
-
-  show(pricingPanel);
+.card{
+  background: var(--glass2);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 14px;
 }
 
-/* ===== Events ===== */
-backBtn.addEventListener("click", () => {
-  if (view === "pricing") return renderCities(selectedState);
-  if (view === "city") return renderStates();
-});
+.back{
+  display:none;
+  width:100%;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.10);
+  color: var(--text);
+  font-weight: 650;
+}
 
-/* ===== Boot ===== */
-renderStates();
+.list{
+  display:block;
+}
+
+.btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding: 16px 14px;
+  margin: 10px 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.22);
+  background: var(--btn);
+  color: var(--text);
+  text-decoration:none;
+  font-size: 17px;
+  font-weight: 650;
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .08s ease, background .15s ease;
+}
+
+.btn:active{ transform: scale(.99); }
+.btn:hover{ background: var(--btnHover); }
+
+.btn.disabled{
+  opacity:.72;
+  pointer-events:none;
+  background: rgba(40,40,40,.20);
+}
+
+.btn.primary{
+  background: rgba(255,255,255,.30);
+  border-color: rgba(255,255,255,.28);
+  font-weight: 750;
+}
+
+.icon{
+  width: 20px;
+  height: 20px;
+  display:block;
+}
+
+.hidden{ display:none; }
+
+.pricing{
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.18);
+}
+
+.priceHeader{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  margin: 10px 0 12px;
+}
+
+.pill{
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.12);
+  border: 1px solid rgba(255,255,255,.14);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.priceGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.priceBox{
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.20);
+  text-align:left;
+}
+
+.priceName{
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+
+.priceBig{
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.priceNote{
+  font-size: 13px;
+  color: rgba(255,255,255,.78);
+  line-height:1.35;
+}
+
+.finePrint{
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+  line-height: 1.4;
+  margin: 12px 0 12px;
+}
+
+.footer{
+  margin-top: 18px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
