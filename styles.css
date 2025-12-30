@@ -18,7 +18,8 @@ body{
   min-height:100vh;
   color: var(--text);
   background:
-    linear-gradient(var(--pinkOverlay), var(--pinkOverlay)),
+    background:
+    linear-gradient(rgba(244,166,193,.78), rgba(244,166,193,.78)),
     url("assets/bg.jpg") center/cover no-repeat fixed;
 }
 
