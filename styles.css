@@ -67,15 +67,9 @@ h1{
   font-size: 14px;
 }
 
-.card {
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.30),
-    rgba(255,255,255,.18)
-  );
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.card{
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .btn{
