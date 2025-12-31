@@ -7,7 +7,7 @@
  * Put your real text number here (E.164 format).
  * Example: +17025550123
  */
-const BOOKING_NUMBER = "+17025550123";
+const BOOKING_NUMBER = "+17029608705";
 
 /** Data from your Instawork screenshots (+ Canada),
  * plus a couple “close distance” add-ons like Henderson/North Las Vegas.
@@ -129,7 +129,7 @@ function makeBtn(label, onClick) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "btn";
-  btn.textContent = `💖 ${label}`;
+  btn.textContent = ${label}`;
   btn.addEventListener("click", onClick);
   return btn;
 }
