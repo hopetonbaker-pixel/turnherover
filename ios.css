@@ -1,0 +1,54 @@
+/* ios.css — Safari iOS stabilization patch */
+
+/* iOS Safari / WebKit detection */
+@supports (-webkit-touch-callout: none) {
+
+  /* 1) Kill backdrop blur (main cause of ghosting/white wash) */
+  .card,
+  .pricing,
+  .btn,
+  .priceBox,
+  .pill {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Replace “glass” with more solid translucency (Safari handles this well) */
+  .card {
+    background: rgba(255, 255, 255, 0.22) !important;
+  }
+
+  .pricing,
+  .priceBox,
+  .pill,
+  .btn {
+    background: rgba(255, 255, 255, 0.18) !important;
+  }
+
+  /* 2) Force GPU compositing to reduce repaint glitches while scrolling */
+  body,
+  .wrap,
+  .card,
+  .pricing {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* 3) Fix iOS viewport height jump (address bar show/hide) */
+  .wrap {
+    min-height: 100svh;
+  }
+
+  /* 4) If you have a background image on body, lock it down */
+  body {
+    background-attachment: scroll !important; /* iOS hates fixed */
+  }
+
+  /* 5) Reduce heavy shadows (optional but helps) */
+  .card,
+  .btn,
+  .priceBox {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;
+  }
+}
