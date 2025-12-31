@@ -129,7 +129,7 @@ function makeBtn(label, onClick) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "btn";
-  btn.textContent = ${label}`;
+  btn.textContent = '${label}`;
   btn.addEventListener("click", onClick);
   return btn;
 }
