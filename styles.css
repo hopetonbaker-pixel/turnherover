@@ -28,8 +28,7 @@ body{
   /* IMPORTANT: keep the background image visible */
   background:
   linear-gradient(var(--pinkOverlay), var(--pinkOverlay)),
-  url("assets/bg.jpg") center 12% / cover no-repeat;
-
+  url("assets/bg.jpg") center top / cover no-repeat fixed;
 background-attachment: scroll;
 
 /* iOS stability */
