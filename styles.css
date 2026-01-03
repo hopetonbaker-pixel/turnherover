@@ -27,11 +27,13 @@ body{
 
   /* IMPORTANT: keep the background image visible */
   background:
-    linear-gradient(var(--pinkOverlay), var(--pinkOverlay)),
-    url("assets/bg.jpg") center/cover no-repeat fixed;
+  linear-gradient(var(--pinkOverlay), var(--pinkOverlay)),
+  url("assets/bg.jpg") center 12% / cover no-repeat;
 
-  /* Helps iOS feel smoother */
-  -webkit-text-size-adjust: 100%;
+background-attachment: scroll;
+
+/* iOS stability */
+-webkit-text-size-adjust: 100%;
 }
 
 .wrap{
